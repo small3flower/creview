@@ -127,8 +127,27 @@ describe('run', () => {
     process.env = {
       GITHUB_TOKEN: 'test-token',
       INPUT_GITHUB_TOKEN: 'test-token',
-      INPUT_ANTHROPIC_API_KEY: 'test-api-key'
+      INPUT_ANTHROPIC_API_KEY: 'test-api-key',
+      INPUT_MODEL_NAME: 'test-model',
+      INPUT_MODEL_TEMPERATURE: '0.7'
     }
+    
+    mockedCore.getInput.mockImplementation(input => {
+      switch (input) {
+        case 'github_token':
+          return 'test-token'
+        case 'anthropic_api_key':
+          return 'test-api-key'
+        case 'model_name':
+          return 'test-model'
+        case 'model_temperature':
+          return '0.7'
+        case 'exclude_files':
+          return ''
+        default:
+          return ''
+      }
+    })
   })
 
   afterEach(() => {

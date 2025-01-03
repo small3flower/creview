@@ -122,26 +122,36 @@ const initializeServices = (
   temperature: number,
   githubToken: string
 ): Layer.Layer<never, never, CodeReviewService | PullRequestService> => {
+  // Create octokit layer
+  const octokitLive = Layer.succeed(
+    octokitTag,
+    github.getOctokit(githubToken)
+  )
+
+  // Create CodeReviewService layer
   const CodeReviewServiceLive = Layer.effect(
     CodeReviewService,
-    Effect.map(LanguageDetectionService, _ =>
-      CodeReviewService.of(new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature))
-    )
+    Effect.gen(function* (_) {
+      const languageDetection = yield* _(LanguageDetectionService)
+      return CodeReviewService.of(
+        new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature)
+      )
+    })
   )
 
-  const octokitLive = Layer.succeed(octokitTag, github.getOctokit(githubToken))
-
+  // Create PullRequestService layer
   const PullRequestServiceLive = Layer.effect(
     PullRequestService,
-    Effect.map(octokitTag, _ => PullRequestService.of(new PullRequestServiceImpl()))
+    Effect.gen(function* (_) {
+      const octokit = yield* _(octokitTag)
+      return PullRequestService.of(new PullRequestServiceImpl(octokit))
+    })
   )
 
-  return CodeReviewServiceLive.pipe(
-    Layer.merge(PullRequestServiceLive),
-    Layer.merge(LanguageDetectionService.Live),
-    Layer.merge(octokitLive),
-    Layer.provide(LanguageDetectionService.Live),
-    Layer.provide(octokitLive)
+  // Combine layers
+  return Layer.provideMerge(
+    Layer.merge(CodeReviewServiceLive, PullRequestServiceLive),
+    Layer.merge(LanguageDetectionService.Live, octokitLive)
   )
 }
 

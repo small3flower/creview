@@ -31,13 +31,19 @@ export const octokitTag = Context.GenericTag<InstanceType<typeof GitHub>>('octok
 
 export const PullRequestService = Context.GenericTag<PullRequestService>('PullRequestService')
 export class PullRequestServiceImpl {
+  private octokit: InstanceType<typeof GitHub>
+
+  constructor(octokit: InstanceType<typeof GitHub>) {
+    this.octokit = octokit
+  }
+
   getFilesForReview = (
     owner: string,
     repo: string,
     pullNumber: number,
     excludeFilePatterns: string[]
-  ): Effect.Effect<PullRequestFile[], UnknownException, InstanceType<typeof GitHub>> => {
-    const program = octokitTag.pipe(
+  ): Effect.Effect<PullRequestFile[], UnknownException, never> => {
+    const program = Effect.sync(() => this.octokit).pipe(
       Effect.flatMap(octokit =>
         retryWithBackoff(
           Effect.tryPromise(() => octokit.rest.pulls.listFiles({ owner, repo, pull_number: pullNumber, per_page: 100 }))
@@ -72,16 +78,16 @@ export class PullRequestServiceImpl {
 
   createReviewComment = (
     requestOptions: CreateReviewCommentRequest
-  ): Effect.Effect<void, Error, InstanceType<typeof GitHub>> =>
-    octokitTag.pipe(
+  ): Effect.Effect<void, Error, never> =>
+    Effect.sync(() => this.octokit).pipe(
       Effect.tap(_ => core.debug(`Creating review comment: ${JSON.stringify(requestOptions)}`)),
       Effect.flatMap(octokit =>
         retryWithBackoff(Effect.tryPromise(() => octokit.rest.pulls.createReviewComment(requestOptions)))
       )
     )
 
-  createReview = (requestOptions: CreateReviewRequest): Effect.Effect<void, Error, InstanceType<typeof GitHub>> =>
-    octokitTag.pipe(
+  createReview = (requestOptions: CreateReviewRequest): Effect.Effect<void, Error, never> =>
+    Effect.sync(() => this.octokit).pipe(
       Effect.flatMap(octokit =>
         retryWithBackoff(Effect.tryPromise(() => octokit.rest.pulls.createReview(requestOptions)))
       )
