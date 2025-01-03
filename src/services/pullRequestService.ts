@@ -78,7 +78,7 @@ export class PullRequestServiceImpl {
 
   createReviewComment = (requestOptions: CreateReviewCommentRequest): Effect.Effect<void, Error, never> =>
     Effect.sync(() => this.octokit).pipe(
-      Effect.tap(_ => core.debug(`Creating review comment: ${JSON.stringify(requestOptions)}`)),
+      Effect.tap(core.debug(`Creating review comment: ${JSON.stringify(requestOptions)}`)),
       Effect.flatMap(octokit =>
         retryWithBackoff(Effect.tryPromise(() => octokit.rest.pulls.createReviewComment(requestOptions)))
       )

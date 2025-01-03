@@ -2,10 +2,7 @@
 import { expect, jest } from '@jest/globals'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { CodeReviewService } from '../services/codeReviewService'
-import { PullRequestService } from '../services/pullRequestService'
 import { run } from '../main'
-import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema'
 import { Effect } from 'effect'
 
 jest.mock('@actions/github', () => {
@@ -41,9 +38,6 @@ jest.mock('@actions/github', () => {
     }))
   }
 })
-
-class NoSuchElementException extends Error {}
-class UnknownException extends Error {}
 
 jest.mock('@actions/core')
 jest.mock('@actions/github')

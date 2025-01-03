@@ -129,7 +129,7 @@ const initializeServices = (
   const CodeReviewServiceLive = Layer.effect(
     CodeReviewService,
     Effect.gen(function* (_) {
-      const languageDetection = yield* _(LanguageDetectionService)
+      yield* _(LanguageDetectionService)
       return CodeReviewService.of(new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature))
     })
   )
