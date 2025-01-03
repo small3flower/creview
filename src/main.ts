@@ -123,19 +123,14 @@ const initializeServices = (
   githubToken: string
 ): Layer.Layer<never, never, CodeReviewService | PullRequestService> => {
   // Create octokit layer
-  const octokitLive = Layer.succeed(
-    octokitTag,
-    github.getOctokit(githubToken)
-  )
+  const octokitLive = Layer.succeed(octokitTag, github.getOctokit(githubToken))
 
   // Create CodeReviewService layer
   const CodeReviewServiceLive = Layer.effect(
     CodeReviewService,
     Effect.gen(function* (_) {
       const languageDetection = yield* _(LanguageDetectionService)
-      return CodeReviewService.of(
-        new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature)
-      )
+      return CodeReviewService.of(new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature))
     })
   )
 

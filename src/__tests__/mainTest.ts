@@ -131,7 +131,7 @@ describe('run', () => {
       INPUT_MODEL_NAME: 'test-model',
       INPUT_MODEL_TEMPERATURE: '0.7'
     }
-    
+
     mockedCore.getInput.mockImplementation(input => {
       switch (input) {
         case 'github_token':

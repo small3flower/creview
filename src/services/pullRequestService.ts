@@ -76,9 +76,7 @@ export class PullRequestServiceImpl {
     return program
   }
 
-  createReviewComment = (
-    requestOptions: CreateReviewCommentRequest
-  ): Effect.Effect<void, Error, never> =>
+  createReviewComment = (requestOptions: CreateReviewCommentRequest): Effect.Effect<void, Error, never> =>
     Effect.sync(() => this.octokit).pipe(
       Effect.tap(_ => core.debug(`Creating review comment: ${JSON.stringify(requestOptions)}`)),
       Effect.flatMap(octokit =>
