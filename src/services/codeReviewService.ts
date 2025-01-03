@@ -1,7 +1,7 @@
 import { ChatPromptTemplate } from '@langchain/core/prompts'
-import { LLMChain } from 'langchain/chains'
 import { ChatAnthropic } from '@langchain/anthropic'
 import type { ChainValues } from '@langchain/core/utils/types'
+import type { Runnable } from '@langchain/core/runnables'
 import { PullRequestFile } from './pullRequestService'
 import parseDiff from 'parse-diff'
 import { LanguageDetectionService } from './languageDetectionService'
@@ -19,10 +19,9 @@ export const CodeReviewService = Context.GenericTag<CodeReviewService>('CodeRevi
 
 export class CodeReviewServiceImpl implements CodeReviewService {
   private readonly llm: ChatAnthropic
-  private readonly chain: LLMChain<string>
+  private readonly chain: Runnable<{ lang: string; diff: string }, ChainValues>
 
-  private static readonly SYSTEM_PROMPT = 
-    "You are a highly skilled and empathetic software engineer, proficient in all programming languages, frameworks, and software architectures. Your primary goal is to provide constructive feedback and insights."
+  private static readonly SYSTEM_PROMPT = `You are a highly skilled and empathetic software engineer, proficient in all programming languages, frameworks, and software architectures. Your primary goal is to provide constructive feedback and insights.`
 
   private static readonly HUMAN_PROMPT = `You are tasked with reviewing a Pull Request. A git diff will be provided to you. 
       Your responsibilities are to:
@@ -46,20 +45,17 @@ export class CodeReviewServiceImpl implements CodeReviewService {
       temperature,
       anthropicApiKey,
       modelName
-    }) as any // Temporary workaround for type compatibility
+    })
 
     const prompt = ChatPromptTemplate.fromMessages([
       ['system', CodeReviewServiceImpl.SYSTEM_PROMPT],
       ['human', CodeReviewServiceImpl.HUMAN_PROMPT]
     ])
-    
-    this.chain = new LLMChain({
-      llm: this.llm as any, // Temporary workaround for type compatibility
-      prompt: prompt as any // Temporary workaround for type compatibility
-    })
+
+    this.chain = prompt.pipe(this.llm)
   }
 
-  private getLanguage(file: PullRequestFile) {
+  private getLanguage(file: PullRequestFile): Effect.Effect<string, NoSuchElementException, never> {
     return Effect.flatMap(LanguageDetectionService, service =>
       Effect.flatMap(
         Effect.succeed(service.detectLanguage(file.filename)),
@@ -74,8 +70,11 @@ export class CodeReviewServiceImpl implements CodeReviewService {
     )
   }
 
-  private reviewDiff(lang: string, diff: string) {
-    return Effect.tryPromise(() => this.chain.call({ lang, diff }))
+  private reviewDiff(lang: string, diff: string): Effect.Effect<ChainValues, UnknownException, never> {
+    return Effect.tryPromise({
+      try: () => this.chain.invoke({ lang, diff }),
+      catch: error => new UnknownException({ message: error instanceof Error ? error.message : 'Unknown error' })
+    })
   }
 
   codeReviewFor(file: PullRequestFile) {

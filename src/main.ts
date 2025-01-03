@@ -82,10 +82,15 @@ export const getRepoContext = () => {
 }
 
 export const run = async (): Promise<void> => {
-  const config = getConfig()
+  const llmConfig = getConfig()
   const { owner, repo, context } = getRepoContext()
 
-  const MainLive = initializeServices(config.anthropicApiKey, config.modelName, config.temperature, config.githubToken)
+  const MainLive = initializeServices(
+    llmConfig.anthropicApiKey,
+    llmConfig.modelName,
+    llmConfig.temperature,
+    llmConfig.githubToken
+  )
 
   const program = Match.value(context.eventName).pipe(
     Match.when('pull_request', () => processFiles(owner, repo, context)),
@@ -100,7 +105,7 @@ export const run = async (): Promise<void> => {
     program,
     Layer.provideMerge(
       MainLive,
-      Layer.merge(LanguageDetectionService.Live, Layer.succeed(octokitTag, github.getOctokit(config.githubToken)))
+      Layer.merge(LanguageDetectionService.Live, Layer.succeed(octokitTag, github.getOctokit(llmConfig.githubToken)))
     )
   )
   const result = await Effect.runPromiseExit(runnable as Effect.Effect<void | void[], unknown, never>)
