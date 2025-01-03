@@ -43,7 +43,8 @@
       "ts"
     ],
     "testMatch": [
-      "**/*.test.ts"
+      "**/*.test.ts",
+      "**/*Test.ts"
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
@@ -65,6 +66,7 @@
   "dependencies": {
     "@actions/core": "^1.10.2",
     "@actions/github": "^6.0.0",
+    "@langchain/anthropic": "^0.3.11",
     "@octokit/plugin-paginate-rest": "^11.3.6",
     "@octokit/rest": "^21.0.2",
     "@octokit/webhooks-definitions": "^3.67.3",
@@ -94,6 +96,6 @@
     "prettier": "^3.4.2",
     "prettier-eslint": "^16.3.0",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.5.3"
   }
 }

@@ -1,7 +1,7 @@
-import { ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate } from 'langchain/prompts'
+import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { LLMChain } from 'langchain/chains'
-import { ChatAnthropic } from 'langchain/chat_models/anthropic'
-import type { ChainValues } from 'langchain/dist/schema'
+import { ChatAnthropic } from '@langchain/anthropic'
+import type { ChainValues } from '@langchain/core/utils/types'
 import { PullRequestFile } from './pullRequestService'
 import parseDiff from 'parse-diff'
 import { LanguageDetectionService } from './languageDetectionService'
@@ -21,17 +21,21 @@ export class CodeReviewServiceImpl implements CodeReviewService {
   private readonly llm: ChatAnthropic
   private readonly chain: LLMChain<string>
 
-  private static readonly SYSTEM_PROMPT =
-    "Act as an empathetic software engineer that's an expert in all programming languages, frameworks and software architecture."
-  private static readonly HUMAN_PROMPT = `Your task is to review a Pull Request. You will receive a git diff. 
-    Review it and suggest any improvements in code quality, maintainability, readability, performance, security, etc.
-    Identify any potential bugs or security vulnerabilities. Check it adheres to coding standards and best practices.
-    Suggest adding comments to the code only when you consider it a significant improvement.
-    Write your reply and examples in GitHub Markdown format. The programming language in the git diff is {lang}.
+  private static readonly SYSTEM_PROMPT = 
+    "You are a highly skilled and empathetic software engineer, proficient in all programming languages, frameworks, and software architectures. Your primary goal is to provide constructive feedback and insights."
 
-    git diff to review:
+  private static readonly HUMAN_PROMPT = `You are tasked with reviewing a Pull Request. A git diff will be provided to you. 
+      Your responsibilities are to:
+      - Evaluate the code for improvements in quality, maintainability, readability, performance, and security.
+      - Identify and point out any potential bugs or security risks.
+      - Ensure the code adheres to established coding standards and best practices.
+      - Recommend adding comments only when they would provide meaningful value or clarification.
 
-    {diff}`
+      Provide your feedback in GitHub Markdown format. Use concise and actionable language. Assume the programming language for this review is {lang}.
+
+      Git diff to review:
+
+      {diff}`
 
   constructor(
     private readonly anthropicApiKey: string,
@@ -42,14 +46,16 @@ export class CodeReviewServiceImpl implements CodeReviewService {
       temperature,
       anthropicApiKey,
       modelName
-    })
+    }) as any // Temporary workaround for type compatibility
 
+    const prompt = ChatPromptTemplate.fromMessages([
+      ['system', CodeReviewServiceImpl.SYSTEM_PROMPT],
+      ['human', CodeReviewServiceImpl.HUMAN_PROMPT]
+    ])
+    
     this.chain = new LLMChain({
-      prompt: ChatPromptTemplate.fromPromptMessages([
-        SystemMessagePromptTemplate.fromTemplate(CodeReviewServiceImpl.SYSTEM_PROMPT),
-        HumanMessagePromptTemplate.fromTemplate(CodeReviewServiceImpl.HUMAN_PROMPT)
-      ]),
-      llm: this.llm
+      llm: this.llm as any, // Temporary workaround for type compatibility
+      prompt: prompt as any // Temporary workaround for type compatibility
     })
   }
 
@@ -88,7 +94,7 @@ export class CodeReviewServiceImpl implements CodeReviewService {
     return this.getLanguage(file).pipe(
       Effect.flatMap(lang =>
         Effect.try({
-          try: () => parseDiff(file.patch!)[0],
+          try: () => parseDiff(file.patch)[0],
           catch: () => new UnknownException({ message: 'Failed to parse diff' })
         }).pipe(
           Effect.flatMap(fileDiff => Effect.all(fileDiff.chunks.map(chunk => this.reviewDiff(lang, chunk.content))))

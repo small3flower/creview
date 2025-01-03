@@ -20,7 +20,7 @@ const getConfig = () => ({
 })
 
 // Extract file processing logic into a separate function
-const processFiles = (owner: string, repo: string, context: any) => {
+const processFiles = (owner: string, repo: string, context: typeof github.context) => {
   return pipe(
     Effect.sync(() => github.context.payload as PullRequestEvent),
     Effect.tap(pullRequestPayload =>

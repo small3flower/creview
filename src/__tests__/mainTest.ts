@@ -1,21 +1,19 @@
 import { expect, jest } from '@jest/globals'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { CodeReviewService } from '../src/services/codeReviewService'
-import { PullRequestService } from '../src/services/pullRequestService'
-import { run } from '../src/main'
+import { CodeReviewService } from '../services/codeReviewService'
+import { PullRequestService } from '../services/pullRequestService'
+import { run } from '../main'
+import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema'
 import { Effect } from 'effect'
-import { Octokit } from '@octokit/rest'
-import type { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods'
-import type { PaginateInterface } from '@octokit/plugin-paginate-rest'
 
 class NoSuchElementException extends Error {}
 class UnknownException extends Error {}
 
 jest.mock('@actions/core')
 jest.mock('@actions/github')
-jest.mock('../src/services/codeReviewService')
-jest.mock('../src/services/pullRequestService')
+jest.mock('../services/codeReviewService')
+jest.mock('../services/pullRequestService')
 
 const mockedCore = jest.mocked(core)
 let mockedGitHub: typeof github
@@ -80,11 +78,11 @@ const mockedPullRequestService = {
 }
 
 // Override the service implementations
-jest.mock('../src/services/codeReviewService', () => ({
+jest.mock('../services/codeReviewService', () => ({
   CodeReviewService: jest.fn().mockImplementation(() => mockedCodeReviewService)
 }))
 
-jest.mock('../src/services/pullRequestService', () => ({
+jest.mock('../services/pullRequestService', () => ({
   PullRequestService: jest.fn().mockImplementation(() => mockedPullRequestService)
 }))
 
