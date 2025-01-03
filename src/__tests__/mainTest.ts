@@ -1,4 +1,13 @@
 // Setup mock before any imports
+import { expect, jest } from '@jest/globals'
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import { CodeReviewService } from '../services/codeReviewService'
+import { PullRequestService } from '../services/pullRequestService'
+import { run } from '../main'
+import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema'
+import { Effect } from 'effect'
+
 jest.mock('@actions/github', () => {
   const mockGitHubContext = {
     eventName: 'pull_request',
@@ -32,15 +41,6 @@ jest.mock('@actions/github', () => {
     }))
   }
 })
-
-import { expect, jest } from '@jest/globals'
-import * as core from '@actions/core'
-import * as github from '@actions/github'
-import { CodeReviewService } from '../services/codeReviewService'
-import { PullRequestService } from '../services/pullRequestService'
-import { run } from '../main'
-import type { PullRequestEvent } from '@octokit/webhooks-definitions/schema'
-import { Effect } from 'effect'
 
 class NoSuchElementException extends Error {}
 class UnknownException extends Error {}
@@ -122,14 +122,14 @@ jest.mock('../services/pullRequestService', () => ({
 }))
 
 describe('run', () => {
-beforeEach(() => {
-  jest.resetAllMocks()
-  process.env = {
-    GITHUB_TOKEN: 'test-token',
-    INPUT_GITHUB_TOKEN: 'test-token',
-    INPUT_ANTHROPIC_API_KEY: 'test-api-key'
-  }
-})
+  beforeEach(() => {
+    jest.resetAllMocks()
+    process.env = {
+      GITHUB_TOKEN: 'test-token',
+      INPUT_GITHUB_TOKEN: 'test-token',
+      INPUT_ANTHROPIC_API_KEY: 'test-api-key'
+    }
+  })
 
   afterEach(() => {
     jest.clearAllMocks()
