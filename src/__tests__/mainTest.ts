@@ -1,3 +1,38 @@
+// Setup mock before any imports
+jest.mock('@actions/github', () => {
+  const mockGitHubContext = {
+    eventName: 'pull_request',
+    payload: {
+      pull_request: {
+        head: { sha: 'test-sha' },
+        number: 123
+      }
+    },
+    repo: {
+      owner: 'test-owner',
+      repo: 'test-repo'
+    },
+    issue: {
+      owner: 'test-owner',
+      repo: 'test-repo',
+      number: 123
+    }
+  }
+
+  const actualGithub = jest.requireActual<typeof import('@actions/github')>('@actions/github')
+  return {
+    ...actualGithub,
+    context: mockGitHubContext,
+    getOctokit: jest.fn().mockImplementation(() => ({
+      rest: {
+        pulls: {
+          get: jest.fn()
+        }
+      }
+    }))
+  }
+})
+
 import { expect, jest } from '@jest/globals'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
@@ -87,10 +122,14 @@ jest.mock('../services/pullRequestService', () => ({
 }))
 
 describe('run', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-    process.env = {}
-  })
+beforeEach(() => {
+  jest.resetAllMocks()
+  process.env = {
+    GITHUB_TOKEN: 'test-token',
+    INPUT_GITHUB_TOKEN: 'test-token',
+    INPUT_ANTHROPIC_API_KEY: 'test-api-key'
+  }
+})
 
   afterEach(() => {
     jest.clearAllMocks()
