@@ -9,9 +9,7 @@ import { Effect, Context, Option } from 'effect'
 import { NoSuchElementException, UnknownException } from 'effect/Cause'
 
 export interface CodeReviewService {
-  codeReviewFor(
-    file: PullRequestFile
-  ): Effect.Effect<ChainValues, NoSuchElementException | UnknownException, never>
+  codeReviewFor(file: PullRequestFile): Effect.Effect<ChainValues, NoSuchElementException | UnknownException, never>
   codeReviewForChunks(
     file: PullRequestFile
   ): Effect.Effect<ChainValues[], NoSuchElementException | UnknownException, never>
@@ -22,8 +20,9 @@ export const CodeReviewService = Context.GenericTag<CodeReviewService>('CodeRevi
 export class CodeReviewServiceImpl implements CodeReviewService {
   private readonly llm: ChatAnthropic
   private readonly chain: LLMChain<string>
-  
-  private static readonly SYSTEM_PROMPT = "Act as an empathetic software engineer that's an expert in all programming languages, frameworks and software architecture."
+
+  private static readonly SYSTEM_PROMPT =
+    "Act as an empathetic software engineer that's an expert in all programming languages, frameworks and software architecture."
   private static readonly HUMAN_PROMPT = `Your task is to review a Pull Request. You will receive a git diff. 
     Review it and suggest any improvements in code quality, maintainability, readability, performance, security, etc.
     Identify any potential bugs or security vulnerabilities. Check it adheres to coding standards and best practices.
@@ -55,7 +54,7 @@ export class CodeReviewServiceImpl implements CodeReviewService {
   }
 
   private getLanguage(file: PullRequestFile) {
-    return Effect.flatMap(LanguageDetectionService, service => 
+    return Effect.flatMap(LanguageDetectionService, service =>
       Effect.flatMap(
         Effect.succeed(service.detectLanguage(file.filename)),
         Option.match({
@@ -78,9 +77,7 @@ export class CodeReviewServiceImpl implements CodeReviewService {
       return Effect.fail(new NoSuchElementException())
     }
 
-    return this.getLanguage(file).pipe(
-      Effect.flatMap(lang => this.reviewDiff(lang, file.patch!))
-    )
+    return this.getLanguage(file).pipe(Effect.flatMap(lang => this.reviewDiff(lang, file.patch!)))
   }
 
   codeReviewForChunks(file: PullRequestFile) {
@@ -89,16 +86,12 @@ export class CodeReviewServiceImpl implements CodeReviewService {
     }
 
     return this.getLanguage(file).pipe(
-      Effect.flatMap(lang => 
+      Effect.flatMap(lang =>
         Effect.try({
           try: () => parseDiff(file.patch!)[0],
           catch: () => new UnknownException({ message: 'Failed to parse diff' })
         }).pipe(
-          Effect.flatMap(fileDiff => 
-            Effect.all(fileDiff.chunks.map(chunk => 
-              this.reviewDiff(lang, chunk.content)
-            ))
-          )
+          Effect.flatMap(fileDiff => Effect.all(fileDiff.chunks.map(chunk => this.reviewDiff(lang, chunk.content))))
         )
       )
     )

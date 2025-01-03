@@ -40,9 +40,7 @@ export class PullRequestServiceImpl {
     const program = octokitTag.pipe(
       Effect.flatMap(octokit =>
         retryWithBackoff(
-          Effect.tryPromise(() =>
-            octokit.rest.pulls.listFiles({ owner, repo, pull_number: pullNumber, per_page: 100 })
-          )
+          Effect.tryPromise(() => octokit.rest.pulls.listFiles({ owner, repo, pull_number: pullNumber, per_page: 100 }))
         )
       ),
       Effect.tap(pullRequestFiles =>
@@ -78,18 +76,14 @@ export class PullRequestServiceImpl {
     octokitTag.pipe(
       Effect.tap(_ => core.debug(`Creating review comment: ${JSON.stringify(requestOptions)}`)),
       Effect.flatMap(octokit =>
-        retryWithBackoff(
-          Effect.tryPromise(() => octokit.rest.pulls.createReviewComment(requestOptions))
-        )
+        retryWithBackoff(Effect.tryPromise(() => octokit.rest.pulls.createReviewComment(requestOptions)))
       )
     )
 
   createReview = (requestOptions: CreateReviewRequest): Effect.Effect<void, Error, InstanceType<typeof GitHub>> =>
     octokitTag.pipe(
       Effect.flatMap(octokit =>
-        retryWithBackoff(
-          Effect.tryPromise(() => octokit.rest.pulls.createReview(requestOptions))
-        )
+        retryWithBackoff(Effect.tryPromise(() => octokit.rest.pulls.createReview(requestOptions)))
       )
     )
 }

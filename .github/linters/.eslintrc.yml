@@ -49,8 +49,7 @@ rules:
     '@typescript-eslint/await-thenable': 'error',
     '@typescript-eslint/ban-ts-comment': 'error',
     '@typescript-eslint/consistent-type-assertions': 'error',
-    '@typescript-eslint/explicit-member-accessibility':
-      ['error', { 'accessibility': 'no-public' }],
+    '@typescript-eslint/explicit-member-accessibility': ['error', { 'accessibility': 'no-public' }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/func-call-spacing': ['error', 'never'],
     '@typescript-eslint/no-array-constructor': 'error',
@@ -81,6 +80,5 @@ rules:
     '@typescript-eslint/unbound-method': 'error',
     'no-redeclare': 'off',
     'github/array-foreach': 'off',
-    "filenames/match-regex": [1, "^[a-z]+([A-Z][a-z0-9]+)*$", true]
-
+    'filenames/match-regex': [1, '^[a-z]+([A-Z][a-z0-9]+)*$', true]
   }

@@ -18,7 +18,7 @@ jest.mock('../src/services/codeReviewService')
 jest.mock('../src/services/pullRequestService')
 
 const mockedCore = jest.mocked(core)
-let mockedGitHub: typeof github;
+let mockedGitHub: typeof github
 
 beforeEach(() => {
   mockedGitHub = {
@@ -42,47 +42,41 @@ beforeEach(() => {
         number: 123
       }
     }
-  };
-  
+  }
+
   // Override the github module with our mock
-  jest.doMock('@actions/github', () => mockedGitHub);
-});
+  jest.doMock('@actions/github', () => mockedGitHub)
+})
 
 afterEach(() => {
-  jest.resetModules();
-});
+  jest.resetModules()
+})
 
 // Manual mock implementations
 const mockedCodeReviewService = {
-  codeReviewFor: jest.fn(() => 
-    Effect.succeed({ text: 'test-review' })
-  ),
-  codeReviewForChunks: jest.fn(() =>
-    Effect.succeed([{ text: 'test-chunk-review' }])
-  )
+  codeReviewFor: jest.fn(() => Effect.succeed({ text: 'test-review' })),
+  codeReviewForChunks: jest.fn(() => Effect.succeed([{ text: 'test-chunk-review' }]))
 }
 
 const mockedPullRequestService = {
   getFilesForReview: jest.fn(() =>
-    Effect.succeed([{ 
-      filename: 'test.js', 
-      patch: 'test-patch',
-      sha: 'test-sha',
-      status: 'modified',
-      additions: 0,
-      deletions: 0,
-      changes: 0,
-      blob_url: '',
-      raw_url: '',
-      contents_url: ''
-    }])
+    Effect.succeed([
+      {
+        filename: 'test.js',
+        patch: 'test-patch',
+        sha: 'test-sha',
+        status: 'modified',
+        additions: 0,
+        deletions: 0,
+        changes: 0,
+        blob_url: '',
+        raw_url: '',
+        contents_url: ''
+      }
+    ])
   ),
-  createReviewComment: jest.fn(() => 
-    Effect.succeed(undefined)
-  ),
-  createReview: jest.fn(() =>
-    Effect.succeed(undefined)
-  )
+  createReviewComment: jest.fn(() => Effect.succeed(undefined)),
+  createReview: jest.fn(() => Effect.succeed(undefined))
 }
 
 // Override the service implementations
@@ -105,7 +99,7 @@ describe('run', () => {
   })
 
   it('should fail if github_token is missing', async () => {
-    mockedCore.getInput.mockImplementation((input) => {
+    mockedCore.getInput.mockImplementation(input => {
       if (input === 'github_token') return ''
       return 'test'
     })
@@ -115,7 +109,7 @@ describe('run', () => {
   })
 
   it('should fail if anthropic_api_key is missing', async () => {
-    mockedCore.getInput.mockImplementation((input) => {
+    mockedCore.getInput.mockImplementation(input => {
       if (input === 'anthropic_api_key') return ''
       return 'test'
     })
@@ -125,7 +119,7 @@ describe('run', () => {
   })
 
   it('should use default model name and temperature', async () => {
-    mockedCore.getInput.mockImplementation((input) => {
+    mockedCore.getInput.mockImplementation(input => {
       if (input === 'model_name') return ''
       if (input === 'model_temperature') return ''
       return 'test'
@@ -144,22 +138,22 @@ describe('run', () => {
 
   it('should process files for pull_request event', async () => {
     mockedPullRequestService.getFilesForReview.mockImplementation(() =>
-      Effect.succeed([{ 
-        filename: 'test.js', 
-        patch: 'test-patch',
-        sha: 'test-sha',
-        status: 'modified',
-        additions: 0,
-        deletions: 0,
-        changes: 0,
-        blob_url: '',
-        raw_url: '',
-        contents_url: ''
-      }])
+      Effect.succeed([
+        {
+          filename: 'test.js',
+          patch: 'test-patch',
+          sha: 'test-sha',
+          status: 'modified',
+          additions: 0,
+          deletions: 0,
+          changes: 0,
+          blob_url: '',
+          raw_url: '',
+          contents_url: ''
+        }
+      ])
     )
-    mockedCodeReviewService.codeReviewFor.mockImplementation(() =>
-      Effect.succeed({ text: 'test-review' })
-    )
+    mockedCodeReviewService.codeReviewFor.mockImplementation(() => Effect.succeed({ text: 'test-review' }))
 
     await run()
 
@@ -169,9 +163,7 @@ describe('run', () => {
       123,
       expect.any(Array)
     )
-    expect(mockedCodeReviewService.codeReviewFor).toHaveBeenCalledWith(
-      expect.objectContaining({ filename: 'test.js' })
-    )
+    expect(mockedCodeReviewService.codeReviewFor).toHaveBeenCalledWith(expect.objectContaining({ filename: 'test.js' }))
     expect(mockedPullRequestService.createReviewComment).toHaveBeenCalledWith(
       expect.objectContaining({
         repo: 'test-repo',
@@ -182,7 +174,7 @@ describe('run', () => {
   })
 
   it('should handle empty exclude_files input', async () => {
-    mockedCore.getInput.mockImplementation((input) => {
+    mockedCore.getInput.mockImplementation(input => {
       if (input === 'exclude_files') return ''
       return 'test'
     })

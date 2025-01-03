@@ -14,7 +14,7 @@ config()
 // Extract configuration logic into a separate function
 const getConfig = () => ({
   anthropicApiKey: core.getInput('anthropic_api_key'),
-  githubToken: core.getInput('github_token'), 
+  githubToken: core.getInput('github_token'),
   modelName: core.getInput('model_name'),
   temperature: parseInt(core.getInput('model_temperature'))
 })
@@ -85,12 +85,7 @@ export const run = async (): Promise<void> => {
   const config = getConfig()
   const { owner, repo, context } = getRepoContext()
 
-  const MainLive = initializeServices(
-    config.anthropicApiKey,
-    config.modelName,
-    config.temperature,
-    config.githubToken
-  )
+  const MainLive = initializeServices(config.anthropicApiKey, config.modelName, config.temperature, config.githubToken)
 
   const program = Match.value(context.eventName).pipe(
     Match.when('pull_request', () => processFiles(owner, repo, context)),
@@ -109,7 +104,7 @@ export const run = async (): Promise<void> => {
     )
   )
   const result = await Effect.runPromiseExit(runnable as Effect.Effect<void | void[], unknown, never>)
-  
+
   if (Exit.isFailure(result)) {
     core.setFailed(result.cause.toString())
   }
@@ -125,7 +120,8 @@ const initializeServices = (
   const CodeReviewServiceLive = Layer.effect(
     CodeReviewService,
     Effect.map(LanguageDetectionService, _ =>
-      CodeReviewService.of(new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature)))
+      CodeReviewService.of(new CodeReviewServiceImpl(anthropicApiKey, modelName, temperature))
+    )
   )
 
   const octokitLive = Layer.succeed(octokitTag, github.getOctokit(githubToken))
