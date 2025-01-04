@@ -100,4 +100,4 @@ __tests__/runner/*
 lib/**/*
 
 
-README.md
+dist
