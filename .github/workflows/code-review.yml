@@ -7,10 +7,6 @@ jobs:
   code-review: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
 
-    permissions:
-      issues: write
-      pull-requests: write
-
     steps:
       - uses: arpitgandhi9/creview@v0.3
         env:
