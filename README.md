@@ -45,7 +45,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: arpitgandhi9/creview@v0.1
         env:
           NODE_OPTIONS: '--experimental-fetch'
@@ -76,7 +76,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: arpitgandhi9/creview@v0.1
         env:
           NODE_OPTIONS: '--experimental-fetch'

@@ -1,8 +1,7 @@
 name: 'code review'
 on: # rebuild any PRs and main branch changes
   pull_request:
-    types:
-      - labeled
+
 permissions:
   contents: read
   pull-requests: write
@@ -30,9 +29,9 @@ jobs:
         id: npm-ci
         run: npm ci
 
-      - name: Package
-        id: npm-package
-        run: npm run package
+      - name: Bundle
+        id: npm-bundle
+        run: npm run bundle
         
       - uses: ./
         env:

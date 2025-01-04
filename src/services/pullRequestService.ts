@@ -49,13 +49,19 @@ export class PullRequestServiceImpl {
           Effect.tryPromise(() => octokit.rest.pulls.listFiles({ owner, repo, pull_number: pullNumber, per_page: 100 }))
         )
       ),
-      Effect.tap(pullRequestFiles =>
-        Effect.sync(() =>
+      Effect.tap(pullRequestFiles => {
+        if (!pullRequestFiles?.data) {
+          return Effect.sync(() => core.error('No files data received from GitHub API'))
+        }
+        if (pullRequestFiles.data.length === 0) {
+          return Effect.sync(() => core.warning('No files found in pull request'))
+        }
+        return Effect.sync(() =>
           core.info(
             `Original files for review ${pullRequestFiles.data.length}: ${pullRequestFiles.data.map(_ => _.filename)}`
           )
         )
-      ),
+      }),
       Effect.flatMap(pullRequestFiles =>
         Effect.sync(() =>
           pullRequestFiles.data.filter(file => {
