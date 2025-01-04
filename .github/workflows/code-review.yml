@@ -1,7 +1,7 @@
 name: 'Code Review'
 
 on:
-  pull_request:
+  push:
 
 jobs:
   code-review: # make sure the action works on a clean machine without building
@@ -12,29 +12,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: npm
-
-      - name: Install Dependencies
-        id: npm-ci
-        run: npm ci
-
-      - name: Bundle
-        id: npm-bundle
-        run: npm run bundle
-        
-      - uses: arpitgandhi9/creview@v0.2
+      - uses: arpitgandhi9/creview@latest
         env:
           NODE_OPTIONS: '--experimental-fetch'
         with:
