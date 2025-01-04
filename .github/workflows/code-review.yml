@@ -1,5 +1,6 @@
 name: 'code review'
-on: # rebuild any PRs and main branch changes
+
+on:
   pull_request:
 
 permissions:
@@ -8,7 +9,6 @@ permissions:
   
 jobs:
   code-review: # make sure the action works on a clean machine without building
-    if: ${{ contains( github.event.label.name, 'AUTO') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
