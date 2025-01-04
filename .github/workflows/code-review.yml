@@ -34,7 +34,7 @@ jobs:
         id: npm-bundle
         run: npm run bundle
         
-      - uses: ./
+      - uses: arpitgandhi9/creview@v0.2
         env:
           NODE_OPTIONS: '--experimental-fetch'
         with:
