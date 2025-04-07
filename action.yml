@@ -1,6 +1,6 @@
-name: 'Claude Assisted Code Review'
+name: 'Claude Assisted Code Review - FORK'
 description: 'Use claude to perform assisted code reviews.'
-author: 'arpitgandhi9'
+author: 'small3flower'
 branding:
   icon: 'git-pull-request'
   color: 'gray-dark'
