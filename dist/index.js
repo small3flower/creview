@@ -149261,38 +149261,25 @@ class CodeReviewServiceImpl {
 exports.CodeReviewServiceImpl = CodeReviewServiceImpl;
 CodeReviewServiceImpl.SYSTEM_PROMPT = `You will be acting as a senior software engineer performing a code review for a colleague.`;
 CodeReviewServiceImpl.HUMAN_PROMPT = `
-      Your goal is to provide concise, valuable feedback on proposed code changes following Google's code review guidelines.
+      You will follow the guidelines for giving a great code review outlined below:
+       https://google.github.io/eng-practices/review/reviewer/looking-for.html
 
-      Here are the proposed code changes you will be reviewing:
+       ---
 
-      <code_diff>
-      {{diff}}
-      </code_diff>
+       Here is the proposed code changes you will be reviewing:
+       {diff}
 
-      Do not include a greeting. Immediately begin reviewing the changes.
+       ---
 
-      Instructions:
-      1. List all files present in the diff.
-      2. For each file in the diff, follow these steps:
-         a. Analyze the changes, noting key modifications and potential issues.
-         b. Prioritize feedback based on impact and importance.
-         c. Decide if feedback is necessary based on your analysis.
-         d. If feedback is needed, provide it using the format specified below.
+       Do not include a greeting. Immediately begin reviewing the changes.
 
-      3. When analyzing and providing feedback:
-         - Focus only on critical issues and major improvements.
-         - Avoid nitpicking or commenting on minor style preferences.
-         - Do not suggest changes that do not significantly improve the code.
-         - Do not suggest changing Chinese comments to English or address other issues targeting code comments.
-
-      4. For each file requiring feedback:
-         - Outline the feedback using one or two sentences.
-         - If a code change is required:
-         * Mention the original code
-         * Propose a code change to fix it
-
-      5. Do not add any text after your suggestions.
-      6. If you have no feedback for a file, do not include a comment for that file.`;
+       For each file, decide if you need to provide any feedback on the changes. 
+       If so, outline the feedback using one or two sentences.
+       If a code change is required, then mention the original code, and
+       then propose a code change to fix it.
+       Focus only on critical issues and major improvements, do not suggest changes that do not significantly improve the code.
+       Do not add any other text after the suggestion.
+       If you have no feedback on a file, do not add a comment for that file.`;
 
 
 /***/ }),
