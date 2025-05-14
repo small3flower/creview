@@ -149259,21 +149259,28 @@ class CodeReviewServiceImpl {
     }
 }
 exports.CodeReviewServiceImpl = CodeReviewServiceImpl;
-CodeReviewServiceImpl.SYSTEM_PROMPT = `You are a highly skilled and empathetic software engineer, proficient in all programming languages, frameworks, and software architectures. Your primary goal is to provide constructive feedback and insights.`;
-CodeReviewServiceImpl.HUMAN_PROMPT = `You are tasked with reviewing a Pull Request. A git diff will be provided to you. 
-      Your responsibilities are to:
-      - Evaluate the code for improvements in quality, maintainability, readability, performance, and security.
-      - Focus only on critical issues and major improvements.
-      - Identify and point out potential bugs or security risks.
-      - Ensure the code adheres to established coding standards and best practices.
-      - Skip suggestions with minimal or no impact, such as whitespace-only changes, comment formatting, or irrelevant renamings.
-      - Recommend adding comments only when they would provide meaningful value or clarification.
+CodeReviewServiceImpl.SYSTEM_PROMPT = `You will be acting as a senior software engineer performing a code review for a colleague.`;
+CodeReviewServiceImpl.HUMAN_PROMPT = `
+      You will follow the guidelines for giving a great code review outlined below:
+       https://google.github.io/eng-practices/review/reviewer/looking-for.html
 
-      Provide your feedback in GitHub Markdown format. Use concise and actionable language. Assume the programming language for this review is {lang}.
+       ---
 
-      Git diff to review:
+       Here is the proposed code changes you will be reviewing:
+       {diff}
 
-      {diff}`;
+       ---
+
+       Do not include a greeting. Immediately begin reviewing the changes.
+
+       For each file, focus only on critical issues and major improvements, 
+       if no such issue is present, do not comment, silence is preferred over low-impact or unnecessary suggestions,
+       decide if you need to provide any feedback on the changes.
+       If so, outline the feedback using one or two sentences.
+       If a code change is required, then mention the original code, and
+       then propose a code change to fix it.
+       Do not add any other text after the suggestion.
+       If you have no feedback on a file, do not add a comment for that file.`;
 
 
 /***/ }),
