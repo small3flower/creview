@@ -149274,8 +149274,14 @@ CodeReviewServiceImpl.HUMAN_PROMPT = `
        Do not include a greeting. Immediately begin reviewing the changes.
 
        For each file, focus only on critical issues and major improvements, 
+<<<<<<< HEAD
+       if no such issue is present, do not comment, do not summarize,
+       decide whether the change warrants necessary and meaningful feedback. 
+       If not, remain silent — silence is preferred over low-impact suggestions.
+=======
        if no such issue is present, do not comment, silence is preferred over low-impact or unnecessary suggestions,
        decide if you need to provide any feedback on the changes.
+>>>>>>> main
        If so, outline the feedback using one or two sentences.
        If a code change is required, then mention the original code, and
        then propose a code change to fix it.
